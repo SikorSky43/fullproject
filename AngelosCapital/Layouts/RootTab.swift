@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct RootTabView: View {
+struct RootTab: View {
     @State private var searchText = ""
     @State private var selectedIndex: Int = 0
     @State private var showLens = false

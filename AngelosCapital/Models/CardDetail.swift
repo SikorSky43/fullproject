@@ -6,7 +6,7 @@
 //
 
 import Foundation
-struct CardDetails: Codable, Identifiable {
+struct CardDetail: Codable, Identifiable {
     let id: Int
     let user_id: Int
     let card_number: String

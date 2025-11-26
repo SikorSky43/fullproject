@@ -78,7 +78,7 @@ final class AuthService {
                     // Switch root to the main tabbed app (single place handling root)
                     if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                        let delegate = scene.delegate as? SceneDelegate {
-                        delegate.changeRoot(RootTabView())
+                        delegate.changeRoot(RootTab())
                     } else {
                         // Fallback: post notification or do nothing (rare)
                         NotificationCenter.default.post(name: .didLogin, object: nil)

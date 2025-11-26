@@ -5,7 +5,7 @@ class CardDetailsService: ObservableObject {
     static let shared = CardDetailsService()
     private init() {}
 
-    @Published var card: CardDetails?
+    @Published var card: CardDetail?
 
     func loadCardDetails(userId: Int) {
         guard let url = URL(string: "https://angeloscapital.com/api/card/user") else { return }
@@ -35,7 +35,7 @@ class CardDetailsService: ObservableObject {
 
             do {
                 // FIX: Decode array instead of single object
-                let decoded = try JSONDecoder().decode([CardDetails].self, from: data)
+                let decoded = try JSONDecoder().decode([CardDetail].self, from: data)
 
                 DispatchQueue.main.async {
                     self.card = decoded.first   // take first card

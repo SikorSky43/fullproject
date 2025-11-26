@@ -82,14 +82,21 @@ class LoginService: ObservableObject {
                 email: email,
                 wallet_address: UserDefaults.standard.string(forKey: "wallet_address"),
                 card_balance: UserDefaults.standard.string(forKey: "card_balance") ?? "0",
-                investment_balance: UserDefaults.standard.string(forKey: "investment_balance") ?? "0"
+                investment_balance: UserDefaults.standard.string(forKey: "investment_balance") ?? "0",
+                account_health: UserDefaults.standard.string(forKey: "account_health") ?? "",
+                score: UserDefaults.standard.string(forKey: "score") ?? "",
+                comments: UserDefaults.standard.string(forKey: "comments") ?? "",
+                
+
+
+
             )
             LogoutService.shared.login(user: restoredUser)
 
             // Switch root immediately
             if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let delegate = scene.delegate as? SceneDelegate {
-                delegate.changeRoot(RootTabView())
+                delegate.changeRoot(RootTab())
             }
 
             self.isLoggedIn = true

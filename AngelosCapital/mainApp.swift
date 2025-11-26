@@ -13,7 +13,7 @@ struct mainApp: App {
                         .transition(.opacity)
                 } else {
                     if session.isLoggedIn {
-                        RootTabView()
+                        RootTab()
                             .transition(.opacity)
                     } else {
                         LoginView()

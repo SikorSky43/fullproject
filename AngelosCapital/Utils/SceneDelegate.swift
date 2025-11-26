@@ -23,7 +23,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let token = UserDefaults.standard.string(forKey: "auth_token")
 
         if isLogged, token != nil {
-            window.rootViewController = UIHostingController(rootView: RootTabView())
+            window.rootViewController = UIHostingController(rootView: RootTab())
         } else {
             window.rootViewController = UIHostingController(rootView: LoginView())
         }

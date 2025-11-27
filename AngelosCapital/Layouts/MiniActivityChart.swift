@@ -1,4 +1,3 @@
-import Foundation
 import SwiftUI
 
 struct MiniActivityChart: View {
@@ -10,8 +9,15 @@ struct MiniActivityChart: View {
         return values.map { max(0.05, $0 / maxVal) }
     }
 
-    private let gradient = LinearGradient(
-        colors: [.orange, .yellow, .green, .cyan, .blue, .purple],
+    // ===========================
+    //  BLUE FINANCE GRADIENT
+    // ===========================
+    private let blueGradient = LinearGradient(
+        colors: [
+            Color(red: 0.30, green: 0.64, blue: 1.00),  // #4DA3FF
+            Color(red: 0.04, green: 0.52, blue: 1.00),  // #0A84FF
+            Color(red: 0.00, green: 0.23, blue: 0.49)   // #003B7C
+        ],
         startPoint: .bottom,
         endPoint: .top
     )
@@ -20,12 +26,9 @@ struct MiniActivityChart: View {
         GeometryReader { geo in
             let count = CGFloat(values.count)
 
-            // *** tighter bar width and spacing ***
             let barWidth = (geo.size.width / count) * 0.45
             let spacing = (geo.size.width - (barWidth * count)) / (count - 1)
-
-            // *** NEW LOWER HEIGHT FACTOR (Apple style) ***
-            let barHeightFactor: CGFloat = 0.55   // was 0.9 = too tall
+            let barHeightFactor: CGFloat = 0.55
 
             ZStack(alignment: .bottomLeading) {
 
@@ -33,7 +36,7 @@ struct MiniActivityChart: View {
                 HStack(alignment: .bottom, spacing: spacing) {
                     ForEach(values.indices, id: \.self) { _ in
                         RoundedRectangle(cornerRadius: 2)
-                            .fill(Color.white.opacity(0.15))
+                            .fill(Color.white.opacity(0.10))
                             .frame(
                                 width: barWidth,
                                 height: geo.size.height * barHeightFactor
@@ -41,11 +44,11 @@ struct MiniActivityChart: View {
                     }
                 }
 
-                // Foreground gradient bars
+                // BLUE gradient bars
                 HStack(alignment: .bottom, spacing: spacing) {
                     ForEach(normalized.indices, id: \.self) { i in
                         RoundedRectangle(cornerRadius: 2)
-                            .fill(gradient)
+                            .fill(blueGradient)
                             .frame(
                                 width: barWidth,
                                 height: normalized[i] * geo.size.height * barHeightFactor
@@ -54,7 +57,7 @@ struct MiniActivityChart: View {
                 }
             }
             .padding(.horizontal, 6)
-            .padding(.top, 6)   // lifts chart upward slightly
+            .padding(.top, 6)
         }
     }
 }

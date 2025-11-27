@@ -50,6 +50,8 @@ class LoginService: ObservableObject {
                 case .success(let user):
                     // LogoutService updated inside AuthService; set local flag just for view state if needed
                     self.isLoggedIn = true
+                    // 🔄 refresh everything immediately
+                    RefreshService.shared.refreshAll()
                 case .failure(let error):
                     self.messageText = "Login failed: \(error.localizedDescription)"
                     self.showMessage = true

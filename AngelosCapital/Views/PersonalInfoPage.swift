@@ -104,6 +104,13 @@ struct PersonalInformationView: View {
             }
             .padding(.bottom, 40)
         }
+        .refreshable {
+            RefreshService.shared.refreshAll()
+        }
+        .onAppear {
+            RefreshService.shared.refreshAll()
+        }
+
         .background(Color.black.ignoresSafeArea())
     }
 

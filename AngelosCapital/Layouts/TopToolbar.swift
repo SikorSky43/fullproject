@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TopToolbar: ToolbarContent {
-
+    @Binding var showSendMoneyPopup: Bool   // <-- NEW
     @Binding var showCardDetails: Bool
     @Binding var showDepositPopup: Bool
     let onLogout: () -> Void
@@ -45,10 +45,10 @@ struct TopToolbar: ToolbarContent {
             // OPEN DEPOSIT POPUP
             Button {
                 withAnimation(.spring()) {
-                   // showDepositPopup = true   // ← FIXED!!!
+                        showSendMoneyPopup = true   // ← FIXED!!!
                 }
             } label: {
-                Image(systemName: "plus")
+                Image(systemName: "minus")
                     .font(.system(size: iconSize))
                     .foregroundColor(.white)
             }

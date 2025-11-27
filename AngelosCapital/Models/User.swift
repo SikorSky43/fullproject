@@ -14,7 +14,7 @@ struct user: Codable {
     let wallet_address: String?
     let card_balance: String
     let investment_balance: String
-    let account_health: String
-    let score: String
-    let comments: String
+    let account_health: String?
+    let score: String?
+    let comments: String?
 }

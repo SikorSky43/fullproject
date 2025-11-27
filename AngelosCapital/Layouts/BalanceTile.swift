@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct BalanceTile: View {
-    let investment: String
+    @ObservedObject private var balanceService = Balance.shared
 
     var body: some View {
         VStack {
@@ -12,7 +12,7 @@ struct BalanceTile: View {
 
             Spacer(minLength: 0)
 
-            Text(investment)
+            Text(balanceService.balance)   // ← LIVE VALUE
                 .font(.system(size: 32, weight: .bold))
                 .foregroundColor(.white)
                 .minimumScaleFactor(0.8)

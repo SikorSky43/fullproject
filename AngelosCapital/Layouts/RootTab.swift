@@ -6,63 +6,66 @@ struct RootTab: View {
     @State private var showLens = false
     @ObservedObject var logout = LogoutService.shared
 
+    // THEME STORAGE
+    @AppStorage("app_color_scheme") private var appColorScheme: String = "system"
+
     init() {
-        // Unselected icon color (soft finance gray)
         UITabBar.appearance().unselectedItemTintColor =
             UIColor.gray.withAlphaComponent(0.55)
 
-        // Slight blue tint in the material background (premium feel)
         UITabBar.appearance().barTintColor =
             UIColor(red: 0.00, green: 0.23, blue: 0.49, alpha: 0.20)
 
-        // Make tab bar fully glass-like
         UITabBar.appearance().backgroundColor = .clear
     }
 
     var body: some View {
         ZStack {
 
-            // ===========================================
-            // MAIN TAB VIEW
-            // ===========================================
             TabView(selection: $selectedIndex) {
 
-                DashboardView()
-                    .tabItem {
-                        Label("Home", systemImage: "house")
-                    }
-                    .tag(0)
+                // HOME TAB
+                ZStack {
+                    Color(.systemBackground).ignoresSafeArea()
+                    DashboardView()
+                }
+                .tabItem {
+                    Label("Home", systemImage: "house")
+                }
+                .tag(0)
 
-                PersonalInformationView()
-                    .tabItem {
-                        Label("Account", systemImage: "person.crop.circle")
-                    }
-                    .tag(1)
+                // ACCOUNT TAB
+                ZStack {
+                    Color(.systemBackground).ignoresSafeArea()
+                    PersonalInformationView()
+                }
+                .tabItem {
+                    Label("Account", systemImage: "person.crop.circle")
+                }
+                .tag(1)
 
-                NavigationStack {
-                    AccountHealthView(
-                        accountHealth: logout.currentUser?.account_health ?? "C",
-                        comments: logout.currentUser?.comments?.components(separatedBy: ",") ?? []
-                    )
-                    .navigationBarHidden(true)
-                    .background(Color.black)
+                // HEALTH TAB
+                ZStack {
+                    Color(.systemBackground).ignoresSafeArea()
+                    NavigationStack {
+                        AccountHealthView(
+                            accountHealth: logout.currentUser?.account_health ?? "C",
+                            comments: logout.currentUser?.comments?.components(separatedBy: ",") ?? []
+                        )
+                        .navigationBarHidden(true)
+                    }
                 }
                 .tabItem {
                     Label("Health", systemImage: "waveform.path.ecg")
                 }
                 .tag(2)
-
             }
-            // Search bar + tab bar behavior from iOS 26
+
             .searchable(text: $searchText)
             .tabBarMinimizeBehavior(.onScrollDown)
-
-            // Selected tab color (your brand blue)
             .tint(.brandBlue)
 
-            // ===========================================
-            // LENS POP BUBBLE
-            // ===========================================
+            // LENS BUBBLE
             VStack {
                 Spacer()
                 LensBubble(
@@ -75,19 +78,21 @@ struct RootTab: View {
             .allowsHitTesting(false)
         }
 
-        // Lens pop animation on tab switch
         .onChange(of: selectedIndex) { index in
             popLens()
-
-            // refresh on Home & Account tabs
             if index == 0 || index == 1 {
                 RefreshService.shared.refreshAll()
             }
         }
 
+        // 🔥 Apply THEME here too
+        .preferredColorScheme(
+            appColorScheme == "light" ? .light :
+            appColorScheme == "dark"  ? .dark  : nil
+        )
     }
 
-    // MARK: - TAB ICONS
+    // MARK: - Tab Helpers
     func tabIcon(for index: Int) -> String {
         switch index {
         case 0: return "house.fill"
@@ -104,7 +109,7 @@ struct RootTab: View {
         }
     }
 
-    // MARK: - LENS BUBBLE POP
+    // MARK: - Lens Pop Animation
     func popLens() {
         withAnimation(.spring(response: 0.33, dampingFraction: 0.58)) {
             showLens = true
@@ -118,7 +123,6 @@ struct RootTab: View {
     }
 }
 
-// MARK: - BRAND COLOR
 extension Color {
-    static let brandBlue = Color(red: 0.04, green: 0.52, blue: 1.00) // #0A84FF
+    static let brandBlue = Color(red: 0.04, green: 0.52, blue: 1.00)
 }

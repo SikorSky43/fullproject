@@ -15,17 +15,23 @@ struct CardDetails: View {
     var body: some View {
         ZStack {
 
-            // ===========================
-            // MAIN CONTENT (CENTERED)
-            // ===========================
+            // ================================================
+            // BACKGROUND (ADAPTIVE)
+            // ================================================
+            Color(.systemBackground)
+                .ignoresSafeArea()
+
+            // ================================================
+            // MAIN CONTENT
+            // ================================================
             VStack(spacing: 24) {
 
                 Text("Card Details")
                     .font(.system(size: 28, weight: .semibold))
-                    .foregroundColor(.white)
+                    .foregroundColor(.primary)
 
                 Text("Your saved card information")
-                    .foregroundColor(.gray)
+                    .foregroundColor(.secondary)
                     .font(.system(size: 16))
 
                 CardInfoTile
@@ -38,9 +44,9 @@ struct CardDetails: View {
             .padding(.bottom, 80)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
 
-            // ===========================
+            // ================================================
             // CLOSE BUTTON
-            // ===========================
+            // ================================================
             VStack {
                 HStack {
                     Button(action: { dismiss() }) {
@@ -51,7 +57,7 @@ struct CardDetails: View {
                             .overlay(
                                 Image(systemName: "xmark")
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(.white.opacity(0.95))
+                                    .foregroundColor(.primary)
                             )
                     }
                     .padding(.leading, 16)
@@ -60,9 +66,9 @@ struct CardDetails: View {
                 Spacer()
             }
 
-            // ===========================
-            // COPY TOAST
-            // ===========================
+            // ================================================
+            // TOAST
+            // ================================================
             if copiedToast {
                 VStack {
                     Spacer()
@@ -70,24 +76,25 @@ struct CardDetails: View {
                         .font(.system(size: 16, weight: .medium))
                         .padding(.horizontal, 20)
                         .padding(.vertical, 10)
-                        .background(Color.white.opacity(0.15))
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.secondary.opacity(0.2))  // Adaptive
+                        )
+                        .foregroundColor(.primary)
                         .padding(.bottom, 40)
                 }
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
-        .background(Color.black.ignoresSafeArea())
+
+        // LOAD DATA
         .onAppear {
             let userId = UserDefaults.standard.integer(forKey: "user_id")
             cardService.loadCardDetails(userId: userId)
-            print("DEBUG — user_id in UserDefaults =", userId)
-
         }
+
         .onReceive(cardService.$card) { card in
             guard let c = card else { return }
-
             self.name = "My Card"
             self.cardNumber = c.card_number
             self.expiry = "\(c.expiry_month)/\(String(c.expiry_year).suffix(2))"
@@ -96,7 +103,9 @@ struct CardDetails: View {
         }
     }
 
+    // ================================================================
     // MARK: - TILE
+    // ================================================================
     var CardInfoTile: some View {
         VStack(spacing: 0) {
 
@@ -118,15 +127,17 @@ struct CardDetails: View {
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(Color(red: 28/255, green: 28/255, blue: 30/255))
+                .fill(Color(.secondarySystemBackground))     // ADAPTIVE TILE
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.white.opacity(0.12), lineWidth: 1)
+                        .stroke(Color.primary.opacity(0.15), lineWidth: 1)  // ADAPTIVE BORDER
                 )
         )
     }
 
+    // ================================================================
     // MARK: - COPY HANDLER
+    // ================================================================
     func copy(_ text: String) {
         guard !text.isEmpty else { return }
         UIPasteboard.general.string = text
@@ -138,8 +149,9 @@ struct CardDetails: View {
     }
 }
 
+// ================================================================
 // MARK: - COMPONENTS
-
+// ================================================================
 struct TileRow: View {
     let title: String
     let value: String
@@ -148,19 +160,22 @@ struct TileRow: View {
     var body: some View {
         HStack {
             Text(title)
-                .foregroundColor(.white.opacity(0.85))
+                .foregroundColor(.primary)
+                .opacity(0.85)
                 .font(.system(size: 16))
 
             Spacer()
 
             Text(value.isEmpty ? "-" : value)
-                .foregroundColor(.white.opacity(0.9))
+                .foregroundColor(.primary)
+                .opacity(0.9)
                 .font(.system(size: 16))
                 .lineLimit(1)
 
             Button(action: copyAction) {
                 Image(systemName: "doc.on.doc")
-                    .foregroundColor(.white.opacity(0.85))
+                    .foregroundColor(.primary)
+                    .opacity(0.85)
                     .font(.system(size: 15))
             }
             .padding(.leading, 6)
@@ -169,9 +184,10 @@ struct TileRow: View {
     }
 }
 
+// Adaptive divider
 struct DividerLine: View {
     var body: some View {
         Divider()
-            .background(Color.white.opacity(0.08))
+            .background(Color.primary.opacity(0.15))
     }
 }

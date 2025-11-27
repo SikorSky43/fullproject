@@ -18,7 +18,6 @@ struct DashboardView: View {
     let status = "Updated just now"
     let activity: [Double] = [0.2, 0.5, 0.8, 1.0, 0.65, 0.55, 0.7, 0.4, 0.35, 0.3, 0.25]
 
-
     var body: some View {
 
         NavigationStack {
@@ -50,13 +49,13 @@ struct DashboardView: View {
 
                     Text(status)
                         .font(.caption)
-                        .foregroundColor(.gray)
-                        .padding(.leading, 20)
+                        .foregroundColor(Color.secondary)   // adaptive
 
                     VStack(alignment: .leading, spacing: 12) {
                         Text("Latest Transactions")
-                            .font(.title3).bold()
-                            .foregroundColor(.white)
+                            .font(.title3)
+                            .bold()
+                            .foregroundColor(Color.primary)   // adaptive
 
                         TransactionList()
                     }
@@ -72,7 +71,9 @@ struct DashboardView: View {
                 RefreshService.shared.refreshAll()
                 motion.start()
             }
-            .background(Color.black.ignoresSafeArea())
+            .background(
+                Color(.systemBackground).ignoresSafeArea()   // MAIN FIX
+            )
             .toolbar {
                 TopToolbar(
                     showSendMoneyPopup: $showSendMoneyPopup,
@@ -83,12 +84,8 @@ struct DashboardView: View {
             }
         }
 
-        // -------------------------------------------------------
-        // IMPORTANT PART:
-        // THIS OVERLAY SITS ABOVE ROOTTABVIEW (EVEN THE TAB BAR)
-        // -------------------------------------------------------
+        // POPUPS ---------------------------------------------------
         .overlay(alignment: .bottom) {
-
             if showSendMoneyPopup {
                 SendMoneyPopup(show: $showSendMoneyPopup)
                     .transition(.move(edge: .bottom))
@@ -96,12 +93,10 @@ struct DashboardView: View {
             }
         }
 
-        // CARD DETAILS POPUP
         .fullScreenCover(isPresented: $showCardDetails) {
             NavigationStack { CardDetails() }
         }
 
-        // DEPOSIT POPUP
         .fullScreenCover(isPresented: $showDepositPopup) {
             DepositPopup(showDepositPopup: $showDepositPopup)
         }
@@ -118,7 +113,6 @@ struct DashboardView: View {
             TransactionService.shared.loadTransactions()
         }
     }
-
 
     // LOAD BALANCES
     private func loadBalances() {

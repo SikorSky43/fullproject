@@ -32,11 +32,11 @@ struct MiniActivityChart: View {
 
             ZStack(alignment: .bottomLeading) {
 
-                // Background grey bars
+                // ADAPTIVE background bars
                 HStack(alignment: .bottom, spacing: spacing) {
                     ForEach(values.indices, id: \.self) { _ in
                         RoundedRectangle(cornerRadius: 2)
-                            .fill(Color.white.opacity(0.10))
+                            .fill(Color.secondary.opacity(0.20))     // ADAPTIVE
                             .frame(
                                 width: barWidth,
                                 height: geo.size.height * barHeightFactor
@@ -44,7 +44,7 @@ struct MiniActivityChart: View {
                     }
                 }
 
-                // BLUE gradient bars
+                // BLUE gradient bars (keep same)
                 HStack(alignment: .bottom, spacing: spacing) {
                     ForEach(normalized.indices, id: \.self) { i in
                         RoundedRectangle(cornerRadius: 2)

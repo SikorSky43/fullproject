@@ -15,19 +15,21 @@ struct TransactionList: View {
             ForEach(visibleTransactions) { item in
                 HStack(spacing: 14) {
 
-                    // Asset Image
+                    // Asset Image Container (adaptive)
                     RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.gray.opacity(0.2))
+                        .fill(Color.secondary.opacity(0.12))
                         .frame(width: 52, height: 52)
                         .overlay(
                             AsyncImage(url: URL(string: item.asset)) { phase in
                                 switch phase {
                                 case .empty:
-                                    ProgressView().tint(.white)
+                                    ProgressView()
+                                        .tint(Color.primary)  // adaptive
                                 case .success(let image):
                                     image.resizable().scaledToFit()
                                 case .failure(_):
-                                    Image(systemName: "photo").foregroundColor(.gray)
+                                    Image(systemName: "photo")
+                                        .foregroundColor(Color.secondary)
                                 @unknown default:
                                     EmptyView()
                                 }
@@ -37,12 +39,13 @@ struct TransactionList: View {
 
                     // Text Info
                     VStack(alignment: .leading, spacing: 4) {
+
                         Text(item.type.capitalized)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.primary)  // adaptive
                             .font(.headline)
 
                         Text(formatDisplayDate(item.date))
-                            .foregroundColor(.gray)
+                            .foregroundColor(Color.secondary) // adaptive
                             .font(.caption)
                     }
 
@@ -50,7 +53,7 @@ struct TransactionList: View {
 
                     // Amount
                     Text(item.amount)
-                        .foregroundColor(.white)
+                        .foregroundColor(Color.primary)  // adaptive
                         .font(.headline)
                 }
                 .padding(16)
@@ -59,8 +62,9 @@ struct TransactionList: View {
             }
         }
         .background(
+            // Adaptive tile background (NOT hard-black)
             RoundedRectangle(cornerRadius: 22)
-                .fill(Color(red: 0.11, green: 0.11, blue: 0.12))
+                .fill(Color(.secondarySystemBackground))
         )
     }
 

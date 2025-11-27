@@ -16,25 +16,40 @@ class Balance: ObservableObject {
     static let shared = Balance()
     private init() {}
 
-    @Published var balance: String = "£0.00"   // Card balance
-    @Published var invest: String = "£0.00"    // Investment balance
+    @Published var balance: String = "£0.00"   // Display card balance
+    @Published var invest: String  = "£0.00"   // Display investment balance
+
+    private let endpoint = "https://angeloscapital.com/api/balance"
 
     // --------------------------------------------------
     // MARK: - Main API Call
     // --------------------------------------------------
     func getBalance(email: String) {
 
-        guard let url = URL(string: "https://angeloscapital.com/api/balance") else { return }
+        guard let url = URL(string: endpoint) else {
+            print("❌ BalanceService — Invalid URL")
+            return
+        }
 
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Content-Type")
 
-        let body: [String: Any] = ["email": email]
-        request.httpBody = try? JSONSerialization.data(withJSONObject: body)
+        let body = ["email": email]
+        request.httpBody = try? JSONEncoder().encode(body)
 
-        URLSession.shared.dataTask(with: request) { data, _, _ in
-            guard let data = data else { return }
+        URLSession.shared.dataTask(with: request) { data, response, error in
+
+            // Basic network safety
+            if let error = error {
+                print("❌ BalanceService — Network error:", error.localizedDescription)
+                return
+            }
+
+            guard let data = data else {
+                print("❌ BalanceService — Empty response data")
+                return
+            }
 
             struct BalanceResponse: Codable {
                 let status: String
@@ -47,20 +62,25 @@ class Balance: ObservableObject {
 
                 DispatchQueue.main.async {
 
-                    // SwiftUI – Update immediately
-                    self.balance = "£" + decoded.card_balance
-                    self.invest  = "£" + decoded.investment_balance
+                    // Force formatting (avoid server invalid formats)
+                    let card = decoded.card_balance.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let invest = decoded.investment_balance.trimmingCharacters(in: .whitespacesAndNewlines)
 
-                    // Save locally
-                    UserDefaults.standard.set(decoded.card_balance, forKey: "card_balance")
-                    UserDefaults.standard.set(decoded.investment_balance, forKey: "investment_balance")
+                    // SwiftUI observable updates
+                    self.balance = "£" + card
+                    self.invest  = "£" + invest
 
-                    // UIKit (CardView) – Send update signal
+                    // Save locally for offline usage
+                    UserDefaults.standard.set(card,   forKey: "card_balance")
+                    UserDefaults.standard.set(invest, forKey: "investment_balance")
+
+                    // UIKit CardView update
                     NotificationCenter.default.post(name: .didUpdateBalance, object: nil)
                 }
 
             } catch {
-                print("Decode error:", error.localizedDescription)
+                print("❌ BalanceService — JSON decode error:", error.localizedDescription)
+                print("⚠️ Raw Server Response:", String(data: data, encoding: .utf8) ?? "nil")
             }
 
         }.resume()
@@ -71,8 +91,7 @@ class Balance: ObservableObject {
     // --------------------------------------------------
     func refresh() {
         let email = UserDefaults.standard.string(forKey: "email") ?? ""
-        if !email.isEmpty {
-            getBalance(email: email)
-        }
+        guard !email.isEmpty else { return }
+        getBalance(email: email)
     }
 }

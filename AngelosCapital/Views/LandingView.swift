@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct LandingView: View {
-    @Binding var showSplash: Bool   // ← Add this!
+    @Binding var showSplash: Bool
 
     @State private var logoOpacity: Double = 0.0
     @State private var glowIntensity: Double = 0.0
@@ -12,14 +12,27 @@ struct LandingView: View {
     var body: some View {
         GeometryReader { geometry in
             ZStack {
+
+                // ------------------------------------------------------
+                // SYSTEM-ADAPTIVE BACKGROUND
+                // Dark mode → black gradient
+                // Light mode → soft white gradient
+                // ------------------------------------------------------
                 RadialGradient(
-                    colors: [.black, .black.opacity(0.95), .black],
+                    colors: [
+                        Color(.systemBackground),
+                        Color(.systemBackground).opacity(0.92),
+                        Color(.systemBackground)
+                    ],
                     center: .center,
                     startRadius: geometry.size.width * 0.4,
                     endRadius: geometry.size.width
                 )
                 .ignoresSafeArea()
 
+                // ------------------------------------------------------
+                // LOGO + GLOW EFFECT (still adaptive)
+                // ------------------------------------------------------
                 Image("mainw")
                     .resizable()
                     .aspectRatio(contentMode: .fit)
@@ -28,10 +41,13 @@ struct LandingView: View {
                     .opacity(logoOpacity)
                     .overlay(
                         Circle()
-                            .stroke(.white.opacity(glowIntensity * 0.2), lineWidth: 2)
+                            .stroke(Color.primary.opacity(glowIntensity * 0.2), lineWidth: 2)
                             .blur(radius: 8)
                     )
-                    .shadow(color: .white.opacity(glowIntensity * 0.1), radius: 12)
+                    .shadow(
+                        color: Color.primary.opacity(glowIntensity * 0.15),
+                        radius: 12
+                    )
             }
             .onAppear {
                 withAnimation(.easeIn(duration: fadeDuration)) {
@@ -41,7 +57,7 @@ struct LandingView: View {
 
                 DispatchQueue.main.asyncAfter(deadline: .now() + totalLoadTime) {
                     withAnimation(.easeOut(duration: 0.5)) {
-                        showSplash = false   // ← Tell app to move forward
+                        showSplash = false
                     }
                 }
             }

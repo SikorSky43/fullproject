@@ -28,11 +28,14 @@ struct DepositPopup: View {
 
     var body: some View {
         ZStack {
-            Color.black.ignoresSafeArea()
+
+            // ADAPTIVE BACKGROUND
+            Color(.systemBackground)
+                .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 24) {
 
-                // Close button with Liquid Glass
+                // Close button
                 HStack {
                     Button {
                         showDepositPopup = false
@@ -44,7 +47,7 @@ struct DepositPopup: View {
                             .overlay(
                                 Image(systemName: "xmark")
                                     .font(.title3.bold())
-                                    .foregroundColor(.white)
+                                    .foregroundColor(Color.primary)   // ADAPTIVE
                             )
                     }
                     Spacer()
@@ -54,13 +57,13 @@ struct DepositPopup: View {
 
                 Text("Deposit")
                     .font(.largeTitle.bold())
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.primary)         // ADAPTIVE
                     .padding(.horizontal)
 
-                // Dropdown with no icons
+                // Dropdown
                 VStack(alignment: .leading, spacing: 12) {
                     Text("Select Coin")
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.secondary)
 
                     Menu {
                         ForEach(coins, id: \.self) { coin in
@@ -68,35 +71,35 @@ struct DepositPopup: View {
                                 selectedCoin = coin
                             } label: {
                                 Text(coin)
-                                    .foregroundColor(.white)
+                                    .foregroundColor(Color.primary)
                             }
                         }
                     } label: {
                         HStack {
                             Text(selectedCoin)
-                                .foregroundColor(.white)
+                                .foregroundColor(Color.primary)
 
                             Spacer()
                             Image(systemName: "chevron.down")
-                                .foregroundColor(.gray)
+                                .foregroundColor(Color.secondary)
                         }
                         .padding()
-                        .background(Color.gray.opacity(0.15))
+                        .background(Color.secondary.opacity(0.15))   // ADAPTIVE
                         .cornerRadius(14)
                     }
                 }
                 .padding(.horizontal)
 
-                // Network field
+                // Network
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Network")
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.secondary)
 
                     Text(network)
-                        .foregroundColor(.white)
+                        .foregroundColor(Color.primary)
                         .padding()
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.gray.opacity(0.15))
+                        .background(Color.secondary.opacity(0.15))   // ADAPTIVE
                         .cornerRadius(14)
                 }
                 .padding(.horizontal)
@@ -104,11 +107,11 @@ struct DepositPopup: View {
                 // Wallet Address
                 VStack(alignment: .leading, spacing: 6) {
                     Text("\(selectedCoin) Wallet Address")
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.secondary)
 
                     HStack {
                         Text(generatedAddress)
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.primary)
                             .font(.system(size: 14, weight: .medium))
                             .lineLimit(1)
 
@@ -116,18 +119,17 @@ struct DepositPopup: View {
 
                         Button {
                             UIPasteboard.general.string = generatedAddress
-
                             withAnimation { copiedToast = true }
                             DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
                                 withAnimation { copiedToast = false }
                             }
                         } label: {
                             Image(systemName: "doc.on.doc")
-                                .foregroundColor(.white)
+                                .foregroundColor(Color.primary)
                         }
                     }
                     .padding()
-                    .background(Color.gray.opacity(0.15))
+                    .background(Color.secondary.opacity(0.15))       // ADAPTIVE
                     .cornerRadius(14)
                 }
                 .padding(.horizontal)
@@ -141,9 +143,11 @@ struct DepositPopup: View {
                     Spacer()
                     Text("Copied!")
                         .padding()
-                        .background(Color.white.opacity(0.15))
-                        .foregroundColor(.white)
-                        .cornerRadius(12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.secondary.opacity(0.2))      // ADAPTIVE
+                        )
+                        .foregroundColor(Color.primary)
                         .padding(.bottom, 40)
                 }
                 .transition(.move(edge: .bottom).combined(with: .opacity))

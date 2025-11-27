@@ -17,14 +17,15 @@ struct SendMoneyPopup: View {
 
         ZStack(alignment: .bottom) {
 
-            Color.black.opacity(0.55)
+            // Dimmed Background (ADAPTIVE)
+            Color.black.opacity(0.45)
                 .ignoresSafeArea()
                 .onTapGesture { hidePopup() }
 
             VStack(spacing: 26) {
 
                 Capsule()
-                    .fill(Color.white.opacity(0.25))
+                    .fill(Color.secondary.opacity(0.35))   // ADAPTIVE
                     .frame(width: 45, height: 5)
                     .padding(.top, 10)
 
@@ -49,7 +50,7 @@ struct SendMoneyPopup: View {
                     withAnimation(.easeInOut) { showKeypad.toggle() }
                 } label: {
                     Text(showKeypad ? "Hide Keypad" : "Show Keypad")
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.secondary)     // ADAPTIVE
                         .font(.system(size: 15))
                 }
 
@@ -62,28 +63,32 @@ struct SendMoneyPopup: View {
 
                 // SEND BUTTON
                 Button {
-
                     sendEmail()
-
                 } label: {
                     if sending {
                         ProgressView()
-                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                            .progressViewStyle(
+                                CircularProgressViewStyle(tint: Color.primary)
+                            )
                             .frame(width: 160, height: 48)
                     } else {
                         Text("Send")
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.primary)     // ADAPTIVE
                             .font(.system(size: 17, weight: .semibold))
                             .frame(width: 160, height: 48)
                     }
                 }
-                .background(Color.white.opacity(0.12))
+                .background(Color.secondary.opacity(0.15))   // ADAPTIVE
                 .cornerRadius(14)
                 .padding(.bottom, 30)
             }
             .frame(maxWidth: .infinity)
             .frame(height: showKeypad ? 520 : 340)
-            .background(Color.black)
+
+            // POPUP BACKGROUND (ADAPTIVE CARD)
+            .background(
+                Color(.secondarySystemBackground)            // 🔥 KEY FIX
+            )
             .cornerRadius(32)
             .transition(.move(edge: .bottom))
         }
@@ -116,19 +121,21 @@ struct SendMoneyPopup: View {
         }
     }
 
+    // MARK: - Circle Button
     private func circleButton(icon: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Circle()
-                .fill(Color.white.opacity(0.08))
+                .fill(Color.secondary.opacity(0.15))         // ADAPTIVE
                 .frame(width: 55, height: 55)
                 .overlay(
                     Image(systemName: icon)
                         .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(.white)
+                        .foregroundColor(Color.primary)     // ADAPTIVE
                 )
         }
     }
 
+    // MARK: - Keypad View
     private var keypadView: some View {
         VStack(spacing: 12) {
             let rows = [
@@ -156,6 +163,7 @@ struct SendMoneyPopup: View {
         .padding(.bottom, 10)
     }
 
+    // MARK: - Keypad Button
     private func keypadButton(_ value: String) -> some View {
         Button {
 
@@ -175,9 +183,9 @@ struct SendMoneyPopup: View {
                 .font(.system(size: value == "⌫" ? 24 : 28,
                               weight: .medium,
                               design: .rounded))
-                .foregroundColor(.white)
+                .foregroundColor(Color.primary)             // ADAPTIVE
                 .frame(width: 80, height: 55)
-                .background(Color.white.opacity(0.10))
+                .background(Color.secondary.opacity(0.15))  // ADAPTIVE
                 .cornerRadius(14)
         }
     }

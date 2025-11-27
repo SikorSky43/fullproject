@@ -5,9 +5,12 @@ struct PersonalInformationView: View {
     @State private var name: String = "AMINE IHIRI"
     @State private var dob: String = "3 February 2002"
     @State private var shareToggle: Bool = false
+
     @StateObject private var bioAuth = BiometricAuth.shared
 
-    // Admin-set image (from your backend)
+    // Theme toggle storage (system / light / dark)
+    @AppStorage("app_color_scheme") private var appColorScheme: String = "system"
+
     let profileImageURL: String = "https://pbs.twimg.com/media/G6iTx5eXkAAqqYy?format=jpg"
 
     var body: some View {
@@ -15,7 +18,7 @@ struct PersonalInformationView: View {
             VStack(spacing: 32) {
 
                 // --------------------------------------------------
-                // PROFILE PICTURE SECTION (FLOATING GLASS)
+                // PROFILE PICTURE SECTION
                 // --------------------------------------------------
                 VStack(spacing: 16) {
 
@@ -29,7 +32,7 @@ struct PersonalInformationView: View {
 
                         default:
                             Circle()
-                                .fill(Color.white.opacity(0.08))
+                                .fill(Color.secondary.opacity(0.15))
                                 .frame(width: 130, height: 130)
                         }
                     }
@@ -37,7 +40,7 @@ struct PersonalInformationView: View {
                     Button(action: {}) {
                         Text("Change")
                             .font(.system(size: 17, weight: .semibold))
-                            .foregroundColor(.white)
+                            .foregroundColor(Color.primary)
                             .padding(.horizontal, 22)
                             .padding(.vertical, 8)
                             .background(
@@ -66,7 +69,7 @@ struct PersonalInformationView: View {
                     glassTile {
                         HStack {
                             Text("Name and Photo Sharing")
-                                .foregroundColor(.white)
+                                .foregroundColor(Color.primary)
                             Spacer()
                             Toggle("", isOn: $shareToggle)
                                 .labelsHidden()
@@ -74,19 +77,36 @@ struct PersonalInformationView: View {
                         .padding(.vertical, 6)
                     }
 
-                    // --------------------------------------------------
-                    // 🔐 FACE ID TOGGLE (NEW)
-                    // --------------------------------------------------
+                    // FACE ID TOGGLE
                     glassTile {
                         HStack {
                             Text("Enable Face ID Login")
-                                .foregroundColor(.white)
+                                .foregroundColor(Color.primary)
 
                             Spacer()
 
                             Toggle("", isOn: $bioAuth.biometricEnabled)
                                 .labelsHidden()
                                 .disabled(!bioAuth.canUseBiometrics)
+                        }
+                        .padding(.vertical, 6)
+                    }
+
+                    // --------------------------------------------------
+                    // LIGHT / DARK MODE TOGGLE  🔥 NEW TILE
+                    // --------------------------------------------------
+                    glassTile {
+                        VStack(alignment: .leading, spacing: 10) {
+
+                            Text("Appearance")
+                                .foregroundColor(Color.primary)
+
+                            Picker("", selection: $appColorScheme) {
+                                Text("System Default").tag("system")
+                                Text("Light Mode").tag("light")
+                                Text("Dark Mode").tag("dark")
+                            }
+                            .pickerStyle(.segmented)
                         }
                         .padding(.vertical, 6)
                     }
@@ -104,19 +124,13 @@ struct PersonalInformationView: View {
             }
             .padding(.bottom, 40)
         }
-        .refreshable {
-            RefreshService.shared.refreshAll()
-        }
-        .onAppear {
-            RefreshService.shared.refreshAll()
-        }
-
-        .background(Color.black.ignoresSafeArea())
+        .refreshable { RefreshService.shared.refreshAll() }
+        .onAppear { RefreshService.shared.refreshAll() }
+        .background(Color(.systemBackground).ignoresSafeArea())
     }
 
-
     // ----------------------------------------------------------
-    // GLASS TILE WRAPPER (LIQUID GLASS)
+    // GLASS TILE WRAPPER (unchanged, adapts automatically)
     // ----------------------------------------------------------
     @ViewBuilder
     func glassTile<Content: View>(@ViewBuilder content: () -> Content) -> some View {
@@ -136,12 +150,12 @@ struct PersonalInformationView: View {
     func tileRow(title: String, value: String) -> some View {
         HStack {
             Text(title)
-                .foregroundColor(.gray)
+                .foregroundColor(Color.secondary)
 
             Spacer()
 
             Text(value)
-                .foregroundColor(.white.opacity(0.95))
+                .foregroundColor(Color.primary)
         }
     }
 
@@ -152,11 +166,11 @@ struct PersonalInformationView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color.primary)
 
                 if !value.isEmpty {
                     Text(value)
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color.secondary)
                         .font(.system(size: 14))
                 }
             }
@@ -164,7 +178,7 @@ struct PersonalInformationView: View {
             Spacer()
 
             Image(systemName: "chevron.right")
-                .foregroundColor(.gray)
+                .foregroundColor(Color.secondary)
         }
     }
 }

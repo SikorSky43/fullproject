@@ -10,11 +10,11 @@ struct PaymentTallTile: View {
 
             Text("Payment Due In")
                 .font(.headline)
-                .foregroundColor(.white.opacity(0.9))
+                .foregroundColor(Color.primary.opacity(0.9))   // ADAPTIVE
 
             Text("\(dueInDays) Days")
                 .font(.system(size: 32, weight: .bold))
-                .foregroundColor(.white)
+                .foregroundColor(Color.primary)                // ADAPTIVE
 
             Spacer()
 
@@ -23,10 +23,12 @@ struct PaymentTallTile: View {
                 Button(action: onPay) {
                     Text("Pay")
                         .font(.headline)
-                        .foregroundColor(.black)
+                        .foregroundColor(Color(.systemBackground)) // Text adapts
                         .padding(18)
-                        .background(Color.white)
-                        .clipShape(Circle())
+                        .background(
+                            Circle()
+                                .fill(Color.primary)              // ADAPTIVE BUTTON
+                        )
                 }
                 Spacer()
             }
@@ -35,7 +37,7 @@ struct PaymentTallTile: View {
         .padding(16)
         .background(
             RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .fill(Color(red: 0.11, green: 0.11, blue: 0.12))
+                .fill(Color(.secondarySystemBackground))         // ADAPTIVE TILE
         )
     }
 }

@@ -23,8 +23,11 @@ struct FloatingAccessory: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 26)
-                .stroke(Color.white.opacity(0.25), lineWidth: 1)
+                .stroke(Color.primary.opacity(0.22), lineWidth: 1)   // ADAPTIVE OUTLINE
         )
-        .shadow(color: Color.black.opacity(0.15), radius: 14, y: 8)
+        .shadow(
+            color: Color.primary.opacity(0.12),                      // ADAPTIVE SHADOW
+            radius: 14, y: 8
+        )
     }
 }

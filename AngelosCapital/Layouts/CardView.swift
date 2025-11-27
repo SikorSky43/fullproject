@@ -15,7 +15,6 @@ struct ColorCacheKey: Hashable {
 
 class CardView: UIView {
 
-    // NOT ObservableObject (UIKit cannot use it)
     private var balanceService = Balance.shared
 
     private var dotViews: [DotView] = []
@@ -27,7 +26,7 @@ class CardView: UIView {
     private let backgroundGradient = CAGradientLayer()
 
     // ---------------------------------------------------------
-    // MARK: - Init
+    // MARK: Init
     // ---------------------------------------------------------
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -39,7 +38,7 @@ class CardView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
 
-    // Listen for balance updates from SwiftUI
+    // Listen for invest balance updates
     private func setupBalanceObserver() {
         NotificationCenter.default.addObserver(
             self,
@@ -56,29 +55,42 @@ class CardView: UIView {
     }
 
     // ---------------------------------------------------------
-    // MARK: - Apple Cash Background Gradient
+    // MARK: Adaptive Apple-Cash Background Gradient
     // ---------------------------------------------------------
     private func setupBackgroundGradient() {
 
-        backgroundGradient.colors = [
-            UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1).cgColor,
-            UIColor(red: 0.07, green: 0.07, blue: 0.07, alpha: 1).cgColor,
-            UIColor(red: 0.03, green: 0.03, blue: 0.03, alpha: 1).cgColor
-        ]
+        // Remove old gradient if needed
+        if backgroundGradient.superlayer == nil {
+            layer.insertSublayer(backgroundGradient, at: 0)
+        }
+
+        if traitCollection.userInterfaceStyle == .dark {
+            // DARK MODE GRADIENT
+            backgroundGradient.colors = [
+                UIColor(red: 0.11, green: 0.11, blue: 0.11, alpha: 1).cgColor,
+                UIColor(red: 0.07, green: 0.07, blue: 0.07, alpha: 1).cgColor,
+                UIColor(red: 0.03, green: 0.03, blue: 0.03, alpha: 1).cgColor
+            ]
+        } else {
+            // LIGHT MODE GRADIENT (Apple Wallet gray card)
+            backgroundGradient.colors = [
+                UIColor(red: 0.95, green: 0.95, blue: 0.97, alpha: 1).cgColor,
+                UIColor(red: 0.90, green: 0.90, blue: 0.92, alpha: 1).cgColor,
+                UIColor(red: 0.86, green: 0.86, blue: 0.88, alpha: 1).cgColor
+            ]
+        }
 
         backgroundGradient.locations = [0.0, 0.45, 1.0]
-
         backgroundGradient.type = .radial
         backgroundGradient.startPoint = CGPoint(x: 0.5, y: 0.25)
         backgroundGradient.endPoint   = CGPoint(x: 0.5, y: 1.3)
-
-        layer.insertSublayer(backgroundGradient, at: 0)
     }
 
     // ---------------------------------------------------------
-    // MARK: - Dot Gradient Update (Blue Apple style)
+    // MARK: Adaptive Dot Gradient Update
     // ---------------------------------------------------------
     func updateColors(withFocalPoint focalPoint: CGPoint) {
+
         CATransaction.begin()
         CATransaction.setDisableActions(true)
 
@@ -88,14 +100,15 @@ class CardView: UIView {
             let y = abs(dot.center.y - focalPoint.y)
             let distance = hypot(x, y)
 
-            let inner: CGFloat = 0
-            let outer: CGFloat = 380
-
-            let t = clipUnit(value: mapRange(distance, inner, outer, 0, 1))
+            let t = clipUnit(value: mapRange(distance, 0, 380, 0, 1))
 
             let lightBlue = UIColor(red: 0.30, green: 0.64, blue: 1.00, alpha: 1)
             let appleBlue = UIColor(red: 0.04, green: 0.52, blue: 1.00, alpha: 1)
-            let deepBlue  = UIColor(red: 0.00, green: 0.23, blue: 0.49, alpha: 1)
+
+            // Deepest blue should be brighter in light mode
+            let deepBlue = traitCollection.userInterfaceStyle == .dark
+                ? UIColor(red: 0.00, green: 0.23, blue: 0.49, alpha: 1)
+                : UIColor(red: 0.00, green: 0.33, blue: 0.70, alpha: 1)
 
             let color: UIColor
             if t < 0.5 {
@@ -125,7 +138,7 @@ class CardView: UIView {
     }
 
     // ---------------------------------------------------------
-    // MARK: - Dot Layout
+    // MARK: Dot Layout
     // ---------------------------------------------------------
     lazy var originFocalPoint: CGPoint = {
         CGPoint(x: bounds.size.width / 2.0, y: bounds.size.height)
@@ -169,15 +182,16 @@ class CardView: UIView {
     }
 
     // ---------------------------------------------------------
-    // MARK: - UI Setup
+    // MARK: Subviews Setup
     // ---------------------------------------------------------
     func setupSubviews() {
 
         layer.cornerCurve = .continuous
         layer.cornerRadius = 13
 
-        layer.borderColor = UIColor(white: 1, alpha: 0.03).cgColor
-        layer.borderWidth = 0.13
+        // Adaptive border
+        layer.borderColor = UIColor.separator.cgColor
+        layer.borderWidth = 0.25
         layer.masksToBounds = true
 
         setupBackgroundGradient()
@@ -186,17 +200,21 @@ class CardView: UIView {
         addSubview(balanceLabel)
 
         nameLabel.text = "Cash"
-        balanceLabel.text = Balance.shared.invest   // initial value
+        balanceLabel.text = Balance.shared.invest
 
         nameLabel.textAlignment = .left
         balanceLabel.textAlignment = .right
 
+        // adaptive text
         [nameLabel, balanceLabel].forEach {
-            $0.textColor = .white
+            $0.textColor = UIColor.label
             $0.font = .boldSystemFont(ofSize: 32)
         }
     }
 
+    // ---------------------------------------------------------
+    // MARK: Layout
+    // ---------------------------------------------------------
     override func layoutSubviews() {
         super.layoutSubviews()
 
@@ -216,5 +234,17 @@ class CardView: UIView {
         if dotViews.isEmpty {
             setupDots()
         }
+    }
+
+    // ---------------------------------------------------------
+    // MARK: Theme Change Handling
+    // ---------------------------------------------------------
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        setupBackgroundGradient()
+        updateColors(withFocalPoint: originFocalPoint)
+
+        setNeedsLayout()
     }
 }
